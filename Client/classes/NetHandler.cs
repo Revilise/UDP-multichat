@@ -27,6 +27,8 @@ namespace Client.classes
                 return _instance;
             }
         }
+        public int LocalPort { get; set; } // local port for getting message
+        public int RemotePort { get; set; } // remote port for sending message
 
         private NetHandler()
         {
@@ -34,8 +36,8 @@ namespace Client.classes
             {
                 NameValueCollection config = ConfigurationSettings.AppSettings;
                 groupAddress = IPAddress.Parse(config["GroupAddress"]);
-                localPort = int.Parse(config["LocalPort"]);
-                remotePort = int.Parse(config["RemotePort"]);
+                //LocalPort = int.Parse(config["LocalPort"]);
+                //RemotePort = int.Parse(config["RemotePort"]);
                 ttl = int.Parse(config["TTL"]);
             }
             catch { MessageBox.Show("Error of config file"); }
@@ -46,8 +48,7 @@ namespace Client.classes
         private bool done = true; // flag of stopping current Thread
         private UdpClient client; // client`s Socket
         private IPAddress groupAddress;
-        private int localPort; // local port for getting message
-        private int remotePort; // remote port for sending message
+
         private int ttl;
 
         private static IPEndPoint remoteEP;
@@ -111,12 +112,15 @@ namespace Client.classes
         {
             ClientName = name;
 
-            client = new UdpClient(localPort);
+            client = new UdpClient(LocalPort);
             client.JoinMulticastGroup(groupAddress, ttl);
 
-            remoteEP = new IPEndPoint(groupAddress, remotePort);
+            remoteEP = new IPEndPoint(groupAddress, RemotePort);
 
-            Thread reciever = new Thread(new ThreadStart(() => Listener(MessageCallback)));
+            Thread reciever = new Thread(
+                new ThreadStart(() => Listener(MessageCallback))
+            );
+
             reciever.IsBackground = true;
             reciever.Start();
 

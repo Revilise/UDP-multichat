@@ -48,6 +48,16 @@ namespace Client.classes
             get => _stopBtnEnable;
             set => SetProperty(ref _stopBtnEnable, value);
         }
+        public int LocalPort
+        {
+            get => _localPort;
+            set => SetProperty(ref _localPort, value);
+        }
+        public int RemotePort
+        {
+            get => _remotePort;
+            set => SetProperty(ref _remotePort, value);
+        }
 
         public static BindingList<Message> Messages { get; private set; } = new BindingList<Message>();
 
@@ -71,7 +81,10 @@ namespace Client.classes
         public RelayCommand StartCommand
         {
             get => new RelayCommand(() =>
-            {
+            {  
+                NetHandler.Instance.LocalPort = LocalPort;
+                NetHandler.Instance.RemotePort = RemotePort;
+
                 NetHandler.Instance.Start(
                     Name,
                     (Message value) => AddMessage(value)
@@ -94,5 +107,8 @@ namespace Client.classes
         private bool _startBtnEnable;
         private bool _stopBtnEnable;
         private bool _sendBtnEnable;
+
+        private int _localPort = 7777;
+        private int _remotePort = 7777;
     }
 }
